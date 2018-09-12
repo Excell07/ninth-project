@@ -1,0 +1,718 @@
+//==============================================================================
+// VARIABLES (utilities)
+//==============================================================================
+
+// FONT STACKS
+$font-url    :  'https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700';
+$font-family :  'Open Sans', sans-serif;
+
+$font-weight-light  : 300;
+$font-weight-regular: 400;
+$font-weight-bold   : 600;
+$font-weight-bolder : 700;
+$base-font-size: 16px;
+
+
+// COLORS ----------------------------------------------------------------------
+$white       :  #ffffff;
+$lightGrey   :  #fbfbfb;
+$darkGrey    :  #b2b2b2;
+$grey        :  #808080;  //grey-ish
+
+$shipCove    :  #7477bf;  //purple
+$mulledWine  :  #4d4c72;  //dark purple
+$deYork      :  #81c98f;  //green
+$glacier     :  #74b1bf;  //blue
+
+//Color usage
+$color-primary      : $shipCove;
+$color-secondary    : $mulledWine;
+
+//Lighter colors
+$color-primary-light   : lighten($shipCove, 10%);
+$color-secondary-light : lighten($mulledWine, 20%);
+
+// BREAKPOINTS -----------------------------------------------------------------
+$breakpoint-small  :     1px;
+$breakpoint-medium :   768px;
+$breakpoint-large  :  1024px;
+
+
+// GRID ------------------------------------------------------------------------
+$grid-column-width         :   100px;
+$grid-gutter-width         :    0;
+$grid-column-count         :    12;
+$grid-container-max-width  :  1050px;
+
+// Make sure font variable is valid
+@if variable-exists($font-url){
+  @import url($font-url);
+}
+
+// GRID - Set the context width
+@function grid-context($grid-column-width, $grid-column-count, $grid-gutter-width){
+  $grid-context: $grid-column-width * $grid-column-count; //when no gutter
+    @return $grid-context;
+}
+
+//==============================================================================
+// MIXINS (utilities)
+//==============================================================================
+  
+@mixin mediaquery($breakpoint){
+  @if $breakpoint == "small"{
+    @media (min-width: $breakpoint-small) and (max-width: $breakpoint-medium){
+      @content;
+    }
+  }
+  @else if $breakpoint == "medium"{
+    @media (min-width: $breakpoint-medium){
+      @content;
+    }
+  }
+  @else if $breakpoint == "large"{
+    @media (min-width: $breakpoint-large){
+      @content;
+    }
+  }
+  @else {
+    @error "Whoops! No value could be retrieved for '#{$breakpoint}'.";
+  }
+}
+
+// FLEXBOX ---------------------------------------------------------------------
+@mixin flex-container($justify-content: flex-start, $direction: column, $display: flex) {
+  display: $display;
+  flex-direction: $direction;
+  justify-content: $justify-content;
+  @content;
+}
+
+//==============================================================================
+// BASE STYLES
+//==============================================================================
+
+* {
+  box-sizing: border-box;
+}
+
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding-left: 0;
+}
+
+
+//==============================================================================
+// GRID
+//==============================================================================
+
+.grid {
+  &__row {
+    padding: 1em;
+    @include mediaquery(medium){
+      @include flex-container(space-between, row){
+        padding: 0;
+        border-bottom: 1px solid $darkGrey;
+      };
+    }
+  }
+  &__col {
+    @include mediaquery(medium){
+      @for $i from 1 through $grid-column-count+1{
+        $context : grid-context($grid-column-width, $grid-column-count, $grid-gutter-width);
+        $target  : ($grid-column-width * $i) + ($grid-gutter-width * ($i - 1));
+        //Generate column modifier classes
+        &--#{$i}{
+          width: percentage($target / $context);
+          padding: 1em;
+          @if $i != 12 {
+            &:first-child {
+              border-right: 1px solid $darkGrey;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.margin-alignment {
+  margin-left: -17px;
+}
+
+.margin-auto {
+  margin-right: auto;
+}
+
+.flex-item-last{
+  margin-left: auto;
+}
+
+//==============================================================================
+// LAYOUT
+//==============================================================================
+
+// WRAPPER 
+.wrapper {
+  @include flex-container(){
+    flex-grow: 1;
+  };
+}
+
+// HEADER 
+.header {
+  z-index: 1000;
+  position: fixed;
+  height: 70px;
+  width: 100%;
+  @include flex-container($direction: row){
+    align-items: center;
+    padding: 1.5em;
+    background-color: $color-primary;
+    color: $white;
+  };
+
+  & #user-name {
+    display: inline-block;
+    color: $white;
+    font-size: .9em;
+    vertical-align: 150%;
+    font-weight: $font-weight-light;
+  }
+  & a {
+    text-decoration: none;
+    color: $white;
+  }
+}
+
+#notification {
+  font-size: .8em;
+  color: #81c98f;
+  border-radius: 50%;
+  width: 3em;
+  margin-top: -1em;
+  margin-left: -2.2em;
+  z-index: 100;
+}
+
+// DASHBOARD CONTAINER 
+.main-container {
+  @include flex-container(space-between, column){
+    max-width: 100%;
+  };
+  @include mediaquery(medium){
+    @include flex-container(flex-start, row);
+  }
+}
+
+main {
+  @include mediaquery(medium){
+    @include flex-container(flex-start, column){
+      flex-grow: 1;
+      padding: 0;
+      border-bottom: 1px solid $darkGrey;
+    };
+  }
+}
+
+.main-content {
+  @include mediaquery(medium){
+    margin-top: 70px;
+    margin-left: 70px;
+    margin-right: auto;
+  }
+}
+
+// NAVIGATION
+.nav-menu ul {
+  background-color: $color-secondary;
+  z-index: 100;
+  @include flex-container(space-around, row){
+    padding: 1em;
+    width: 100%;
+  }
+  top: 69px;
+  position: fixed;
+  @include mediaquery(medium){
+    @include flex-container(flex-start, column);
+    height: 100%;
+    width: 70px;
+  }
+}
+
+// SEARCH 
+.search-bar {
+  @include mediaquery(medium){
+    background-color: $lightGrey;
+    border-bottom: 1px solid $darkGrey;
+    border-left: 1px solid $darkGrey;
+    padding: 1em;
+  }
+  .search {
+    background: $white url('../icons/icon-magnifying.svg') no-repeat right center;
+    background-position: 95%;
+    @include mediaquery(medium){
+      width: 75%;
+      float: right;
+      margin: 0;
+    }
+    @include mediaquery(large){
+      width: 20em;
+      float: right;
+      margin: 0;
+    }
+  }
+}
+
+#notifications {
+  cursor: pointer;
+  position: fixed;
+  right: 72px;
+  top: 57px;
+  width: 250px;
+  height: auto;
+  background: $white;
+  border: solid 1px $lightGrey;
+  border-radius: 5px;
+  color: $grey;
+  font-size: .8em;
+  visibility: hidden;
+  z-index: 1000;
+  @include mediaquery(medium){
+    max-width: 300px;
+    height: auto;
+    color: $grey;
+    font-size: .9em;
+  }
+}
+
+#notifications::before {
+  content: '';
+  display: block;
+  width: 0;
+  height: 0;
+  color: transparent;
+  border: 10px solid #ccc;
+  border-color: transparent transparent #fff;
+  margin-top: -20px;
+  margin-left: 150px;
+}
+
+.notification-message {
+  border-bottom: 1px solid $lightGrey;
+  padding: 5px 5px 5px 10px;
+}
+
+.notification-message:hover {
+  background: #e2e3f6;
+}
+
+.member-avatar {
+  height: 20px;
+}
+
+.activity-description {
+  margin: 0;
+}
+
+.member-name {
+  font-weight: 600;
+  color: #4d4c72;
+}
+
+.activity-time {
+  font-size: .75em;
+  color: lightgray;
+  padding: 2px;
+  margin: 0;
+}
+
+// MAIN CONTENT AREA -----------------------------------------------------------
+
+canvas {
+  max-width: 100%;
+}
+
+.stat-filter-nav {
+  padding: 1em;
+  border-bottom: 0;
+  & .stat-filter{
+    font-weight: $font-weight-bold;
+    &:hover {
+      border-radius: 20px;
+      background-color: #81c98f;
+      color: $white;
+    }
+  }
+}
+
+.flex-inline {
+  display: flex;
+  justify-content: center;
+}
+
+.social-container {
+  @include mediaquery(medium){
+    @include flex-container(space-between , row);
+  }
+}
+
+.social-card {
+  @include flex-container(flex-start, row){
+    align-items: center;
+    height: auto;
+    margin: 2em 0;
+    padding: 0.5em 2em;
+    background-color: $lightGrey;
+    border: 1px solid $darkGrey;
+    border-radius: 4px;
+  };
+
+  @include mediaquery(medium){
+    width: 30%;
+    padding: 0.5em;
+    margin: 0 0 2em 0;
+  }
+  @include mediaquery(large){
+    padding: 0.5em 3em 0.5em 1em;
+  }
+}
+
+.member-info {
+  @include flex-container(flex-start, row){
+    align-items: center;
+  };
+  p {
+    font-size: .87em;
+    margin: .1em;
+  }
+  .member-email, {
+    font-size: .75em;
+    color: $color-primary;
+  }
+  .activity-time {
+    font-size: .75em;
+  }
+  .activity-arrow {
+    font-size: 2em;
+    color: $color-primary;
+  }
+}
+
+.no-bottom-border {
+  border-bottom: 0;
+}
+
+// ALERT
+#cookie-alert {
+  position: relative;
+  @include flex-container(space-between, row){
+    background-color: $color-primary;
+    padding: 0 1em;
+    margin-bottom: 1em;
+  }
+  p {
+    color: $white;
+    display: inline-block;
+  }
+}
+
+#close-alert {
+  color: $white;
+  width: 20px;
+  height: 20px;
+  display: block;
+  position: absolute;
+  right: -.30%;
+  top: 20%;
+  line-height: 0;
+  cursor: pointer;
+}
+
+//==============================================================================
+// TYPOGRAPHY
+//==============================================================================
+
+.headline-primary {
+  font-size: 1.5em;
+  color: $grey;
+  font-weight: $font-weight-regular;
+}
+
+.headline-secondary {
+  font-size: .9em;
+  color: $grey;
+  font-weight: $font-weight-bold;
+  text-transform: uppercase;
+}
+
+#site-logo {
+  display: inline-block;
+  margin-top: 0;
+  margin-bottom: 0;
+  font-size: 1em;
+  font-weight: $font-weight-light;
+  @include mediaquery(medium){
+    font-size: 1.6em;
+  }
+}
+
+.social-headline {
+  color: $color-primary;
+  font-size: 1.2em;
+  font-weight: $font-weight-bolder;
+  margin: 0;
+}
+
+.social-number {
+  color: #808080;
+  font-size: 2em;
+  font-weight: $font-weight-light;
+  margin: 0;
+}
+
+//==============================================================================
+// GRAPHICS
+//==============================================================================
+
+// IMAGES
+.avatar {
+  width: 40px;
+  height: 40px;
+  margin: .5em;
+  border-radius: 50%;
+}
+
+// ICONS
+.header .icon {
+  width: 40px;
+  height: 40px;
+  margin: 0 .8em 0 1em;
+  padding-right: .7em;
+  border-right: 1px solid $color-secondary;
+  cursor: pointer;
+}
+
+.nav-menu .icon {
+  width: 30px;
+  fill: $color-secondary-light;
+  @include mediaquery(medium){
+    margin-top: 2em;
+  }
+  &:hover{
+    fill: $white;
+  }
+}
+
+.nav-menu .current {
+  fill: $white;
+}
+
+.social-icon {
+  background-color: $color-primary;
+  width: 80px;
+  height: 80px;
+  padding: 20px;
+  margin: 1em;
+  border-radius: 50%;
+  @include mediaquery(medium){
+    width: 70px;
+    height: 70px;
+    padding: 15px;
+    margin: .5em .5em .5em 0;
+  }
+  @include mediaquery(large){
+    margin: 1em;
+  }
+  .icon {
+    width: 100%;
+    height: 100%;
+    fill: $white;
+    @include mediaquery(medium){
+      width: 90%;
+      height: 90%;
+    }
+  }
+}
+
+//==============================================================================
+// FORMS
+//==============================================================================
+
+input,
+select,
+textarea {
+  font-family: $font-family;
+  font-weight: $font-weight-light;
+  color: $grey;
+  width: 100%;
+  padding:1em;
+  margin-bottom: 1em;
+  background-color: #faf8f8;
+  border: 1px solid lightgrey;
+  border-radius: 4px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+input[type="search"] {
+  box-sizing: border-box;
+}
+
+textarea {
+  height: 6em;
+}
+
+select[disabled] {
+  color: $darkGrey;
+}
+
+.setting-options {
+  @include mediaquery(large){
+    max-width: 60%;
+  }
+}
+
+.setting-option {
+  margin-bottom: .5em;
+  p {
+    font-size: .9em;
+    font-weight: $font-weight-regular;
+  }
+  @include mediaquery(medium){
+    @include flex-container(space-between, row){
+      align-items: center;
+    }
+  }
+  @include mediaquery(large){
+    @include flex-container(space-between, row){
+    }
+  }
+}
+
+// ON/OFF TOGGLE SWITCH --------------------------------------------------------
+.switch {
+	position: relative;
+	display: block;
+	width: 72px;
+	height: 32px;
+	padding: 1px;
+	margin: 0 0 0 1em;
+  background: $darkGrey;
+	border-radius: 18px;
+	cursor: pointer;
+	box-sizing:content-box;
+  &-input {
+  	position: absolute;
+  	top: 0;
+  	left: 0;
+  	opacity: 0;
+  	box-sizing:content-box;
+  }
+  &-label {
+  	position: relative;
+  	display: block;
+  	height: inherit;
+  	font-size: .75em;
+  	text-transform: uppercase;
+  	background: $darkGrey;
+  	border-radius: inherit;
+  	box-sizing:content-box;
+  }
+  &-label:before,
+  &-label:after {
+  	position: absolute;
+  	top: 50%;
+  	margin-top: -.5em;
+  	line-height: 1;
+  	transition: inherit;
+  	box-sizing:content-box;
+  }
+  &-label:before {
+  	content: attr(data-off);
+  	right: 11px;
+  	color: $lightGrey;
+  }
+  &-label:after {
+  	content: attr(data-on);
+  	left: 11px;
+  	color: $white;
+  	opacity: 0;
+  }
+  &-input:checked ~
+  &-label {
+  	background: $color-primary;
+  }
+  &-input:checked ~
+  &-label:before {
+  	opacity: 0;
+  }
+  &-input:checked ~
+  &-label:after {
+  	opacity: 1;
+  }
+  &-handle {
+  	position: absolute;
+  	top: 3px;
+  	left: 3px;
+  	width: 28px;
+  	height: 28px;
+    background-color: $white;
+  	border-radius: 50%;
+  }
+  &-input:checked ~
+  &-handle {
+  	left: 42px;
+  }
+
+  // Transition
+  &-label,
+  &-handle {
+  	transition: all 0.3s ease;
+  }
+}
+
+//==============================================================================
+// BUTTONS
+//==============================================================================
+
+button {
+  height: 3em;
+  width: 100%;
+  background-color: $color-primary;
+  border: 0;
+  border-radius: 4px;
+  color: $white;
+  text-transform: uppercase;
+  margin-bottom: .5em;
+}
+
+.stat-filter {
+  width: auto;
+  height: 2em;
+  background-color: transparent;
+  color: $grey;
+  text-transform: none;
+  outline: none;
+}
+
+.active-filter {
+  border-radius: 20px;
+  background-color: $deYork;
+  color: $white;
+}
+
+.cancel {
+  background-color: $darkGrey;
+}
+
+.setting-buttons {
+  @include mediaquery(large){
+    @include flex-container(space-between, row);
+    button {
+      width: 48%;
+    }
+  }
+}
